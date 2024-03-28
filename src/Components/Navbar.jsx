@@ -28,20 +28,7 @@ const Navbar = () => {
             <b>TODO LIST</b>
           </Link>
         </div>
-        <div className="flex gap-4">
-          <div>
-            {" "}
-            <NavLink to="/all-todo"> AllTodo</NavLink>
-          </div>
-          {/* <div>
-            {" "}
-            <NavLink to="/edit-todo"> Edit Todo</NavLink>
-          </div> */}
-          <div>
-            {" "}
-            <NavLink to="/add-todo"> Add todo</NavLink>
-          </div>
-        </div>
+
         <div className="flex items-center gap-4">
           {user?.email ? (
             <>

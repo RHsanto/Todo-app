@@ -17,9 +17,10 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState("all");
-  const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(1);
   const { jobs } = useSelector(state => state.jobs);
-  console.log(jobs);
+  const completeJobs = jobs.filter(job => job.completedOn);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(showJobs());
@@ -33,13 +34,36 @@ const Home = () => {
     dispatch(completeTask(id));
   };
 
-  const completeJobs = jobs.filter(job => job.completedOn);
+  // Pagination Function
+  const ITEMS_PER_PAGE = 10;
+  const totalItems = Array.isArray(jobs) ? jobs.length : 0;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const changePage = page => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="container mx-auto my-5">
       <div>
         {/* Task Header */}
-        <div className="text-4xl font-bold flex items-center justify-center gap-2 my-10">
+        <div className="text-4xl font-bold flex items-center justify-center gap-2 my-5">
           <SiTask className="text-orange-400" />
           <h1>Daily Tasks</h1>
         </div>
@@ -104,141 +128,106 @@ const Home = () => {
               </tr>
             </thead>
             <tbody>
-              {activeTab === "all" && (
-                <>
-                  {jobs?.map(data => {
-                    const { id, title, desc, author, completedOn, userImg, priority } = data;
-                    return (
-                      <tr key={id + 1}>
-                        <td className="p-2 border ">
-                          {completedOn ? (
-                            <input type="checkbox" disabled />
-                          ) : (
-                            <input
-                              onClick={() => handleTab(id)}
-                              type="checkbox"
-                              className="cursor-pointer ml-2"
-                            />
-                          )}
-                        </td>
-                        <td className="p-2 border  ">
-                          {completedOn ? (
-                            <div className="text-green-600 flex justify-center items-center gap-3">
-                              <MdOutlineDoneAll />
-                              Done
-                            </div>
-                          ) : (
-                            <div className="flex justify-center items-center gap-2 text-orange-500">
-                              {" "}
-                              <BiLoaderCircle /> In Process
-                            </div>
-                          )}
-                        </td>
-                        <td className="p-2 border">
-                          <div className="flex gap-2 items-center justify-center">
-                            <img className="w-10  rounded-lg" src={userImg} alt="img" />
-                            {author}
-                          </div>
-                        </td>
-                        <td className="p-2 border">
-                          {completedOn ? <s>{title}</s> : <>{title}</>}
-                        </td>
-                        <td className="p-2 border">
-                          {completedOn ? <div>{completedOn}</div> : <div>Incomplete</div>}
-                        </td>
-                        <td className="p-2 border ">
-                          <button
-                            className={`${
-                              priority === "Low"
-                                ? " bg-yellow-300  "
-                                : priority === "Medium"
-                                ? " bg-orange-300 "
-                                : " bg-red-300 "
-                            } p-1 px-4 rounded`}
-                          >
-                            {priority || "Low"}
-                          </button>
-                        </td>
-                        <td className="p-2 border">
-                          <div className="flex items-center gap-4 justify-center">
-                            {completedOn ? (
-                              ""
-                            ) : (
-                              <Link to="/edit-todo" state={{ id, title, desc, priority }}>
-                                <button className="bg-sky-100 text-sky-600 py-2 px-2 rounded ">
-                                  <MdModeEdit className="text-xl" />
-                                </button>
-                              </Link>
-                            )}
-
-                            <button
-                              onClick={() => {
-                                handleDelete(id);
-                              }}
-                              className="bg-red-100 text-red-600 py-2 px-2 rounded "
-                            >
-                              <MdDelete className="text-xl" />
+              {(activeTab === "all" ? jobs : completeJobs).slice(startIndex, endIndex).map(data => {
+                const { id, title, desc, author, completedOn, userImg, priority } = data;
+                return (
+                  <tr key={id}>
+                    <td className="p-2 border">
+                      <input disabled={completedOn} onClick={() => handleTab(id)} type="checkbox" />
+                    </td>
+                    <td className="p-2 border">
+                      {completedOn ? (
+                        <div className="text-green-600 flex justify-center items-center gap-3">
+                          <MdOutlineDoneAll />
+                          Done
+                        </div>
+                      ) : (
+                        <div className="flex justify-center items-center gap-2 text-orange-500">
+                          {" "}
+                          <BiLoaderCircle /> In Process
+                        </div>
+                      )}
+                    </td>
+                    <td className="p-2 border">
+                      <div className="flex gap-2 items-center justify-center">
+                        <img className="w-10  rounded-lg" src={userImg} alt="img" />
+                        {author}
+                      </div>
+                    </td>
+                    <td className="p-2 border">{completedOn ? <s>{title}</s> : <>{title}</>}</td>
+                    <td className="p-2 border">
+                      {completedOn ? <div>{completedOn}</div> : <div>Incomplete</div>}
+                    </td>
+                    <td className="p-2 border ">
+                      <button
+                        className={`${
+                          priority === "Low"
+                            ? " bg-yellow-300  "
+                            : priority === "Medium"
+                            ? " bg-orange-300 "
+                            : " bg-red-300 "
+                        } p-1 px-4 rounded`}
+                      >
+                        {priority || "Low"}
+                      </button>
+                    </td>
+                    <td className="p-2 border">
+                      <div className="flex items-center gap-4 justify-center">
+                        {completedOn ? (
+                          ""
+                        ) : (
+                          <Link to="/edit-todo" state={{ id, title, desc, priority }}>
+                            <button className="bg-sky-100 text-sky-600 py-2 px-2 rounded ">
+                              <MdModeEdit className="text-xl" />
                             </button>
-                            {/* <button className="bg-green-100 text-green-600 py-2 px-2 rounded">
-                          <MdFileDownloadDone className="text-xl" />
-                        </button> */}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </>
-              )}
-              {activeTab === "complete" && (
-                <>
-                  {completeJobs?.map((data, index) => {
-                    const { id, title, author, completedOn, userImg, priority } = data;
-                    return (
-                      <tr key={id + 1}>
-                        <td className="p-2 border ">{index + 1}</td>
-                        <td className="p-2 border ">
-                          <button className="bg-green-200 py-1 px-4 rounded"> Done</button>
-                        </td>
-                        <td className="p-2 border">
-                          <div className="flex gap-2 items-center justify-center">
-                            <img className="w-10  rounded-lg" src={userImg} alt="img" />
-                            {author}
-                          </div>
-                        </td>
-                        <td className="p-2 border">
-                          <s>{title}</s>
-                        </td>
-                        <td className="p-2 border">{completedOn}</td>
-                        <td className="p-2 border ">
-                          <button
-                            className={`${
-                              priority === "low"
-                                ? " bg-yellow-100  "
-                                : priority === "medium"
-                                ? " bg-orange-200 "
-                                : " bg-red-200 "
-                            } p-1 px-4 rounded`}
-                          >
-                            {priority || "Low"}
-                          </button>
-                        </td>
-                        <td className="p-2 border">
-                          <button
-                            onClick={() => {
-                              handleDelete(id);
-                            }}
-                            className="bg-red-100 text-red-600 py-2 px-2 rounded "
-                          >
-                            <MdDelete className="text-xl" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </>
-              )}
+                          </Link>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            handleDelete(id);
+                          }}
+                          className="bg-red-100 text-red-600 py-2 px-2 rounded "
+                        >
+                          <MdDelete className="text-xl" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+          {/* Pagination */}
+          <div className="flex  items-center mt-4 gap-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-200 rounded "
+            >
+              Prev
+            </button>
+            <div>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => changePage(index + 1)}
+                  className={`px-4 py-2 mx-1  rounded ${
+                    currentPage === index + 1 ? "bg-violet-500 text-white" : "bg-gray-200"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-200 rounded "
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
