@@ -3,18 +3,17 @@ import { login } from "../Redux/Slice/authSlice";
 import useFirebase from "../hooks/useFirebase";
 import { useDispatch } from "react-redux";
 import google from "../assets/img/google.png";
+import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
   // Hooks
   const { signInUsingGoogle, user, logOut } = useFirebase();
-  const dispatch = useDispatch();
 
   // Event handlers
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInUsingGoogle();
       const user = result?.user;
-      dispatch(login());
     } catch (error) {
       console.error("Error occurred during Google sign in:", error);
     }
@@ -22,10 +21,26 @@ const Navbar = () => {
 
   // Rendering
   return (
-    <div className="bg-slate-100 p-4 rounded">
+    <div className="container mx-auto bg-slate-100 p-4 rounded">
       <div className="flex justify-between items-center">
         <div>
-          <b>TODO LIST</b>
+          <Link to="/">
+            <b>TODO LIST</b>
+          </Link>
+        </div>
+        <div className="flex gap-4">
+          <div>
+            {" "}
+            <NavLink to="/all-todo"> AllTodo</NavLink>
+          </div>
+          {/* <div>
+            {" "}
+            <NavLink to="/edit-todo"> Edit Todo</NavLink>
+          </div> */}
+          <div>
+            {" "}
+            <NavLink to="/add-todo"> Add todo</NavLink>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           {user?.email ? (

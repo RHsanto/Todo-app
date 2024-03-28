@@ -1,21 +1,35 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Navbar from "./Components/Navbar";
-import TaskList from "./Components/TaskList";
-import LogIn from "./Components/Authentication/LogIn";
-import Register from "./Components/Authentication/Register";
+import Index from "./routes";
 
 const App = () => {
+  // useEffect(() => {
+  //   dispatch(fetchPost());
+  // }, [dispatch]);
+
   return (
-    <div className="container mx-auto">
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<TaskList />} />
-          <Route path="/login" element={<LogIn />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+    // <div className="text-center  ">
+    //   <Navbar />
+
+    //   {/* <div className="mt-10">
+    //     {isLoading && <>Loading....</>}
+    //     {error && <>{error}</>}
+    //     {post.map((data, index) => (
+    //       <div key={data?.id}>
+    //         <li>{index + 1}</li>
+    //       </div>
+    //     ))}
+    //   </div> */}
+    //   <div className="mt-10">
+    //     <BrowserRouter>
+    //       <Routes>
+    //         <Route path="/" element={<Home />}></Route>
+    //         <Route path="/add-todo" element={<AddTask />}></Route>
+    //         <Route path="/all-todo" element={<AllTodo />}></Route>
+    //         <Route path="/edit-todo" element={<EditTask />}></Route>
+    //       </Routes>
+    //     </BrowserRouter>
+    //   </div>
+    // </div>
+    <Index />
   );
 };
 
